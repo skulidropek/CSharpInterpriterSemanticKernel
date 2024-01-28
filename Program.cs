@@ -24,24 +24,9 @@ builder.Services.AddSingleton(s => new DependenciesOptions()
 });
 
 builder.Plugins.AddFromType<RoslynCompilingPlugin>();
-//builder.Services.AddSingleton< RoslynCompilingPlugin>();
 
 var kernel = builder.Build();
 
-//var roslyn = kernel.Services.GetRequiredService<RoslynCompilingPlugin>();
-//Console.WriteLine(await roslyn.ExecuteCodeAsync(@"
-//using System;
-//class Program
-//{
-//    static void Main()
-//    {
-//        Console.WriteLine(""12321"");
-//    }
-//}
-//"));
-
-//return;
-// Retrieve the chat completion service from the kernel
 IChatCompletionService chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
 
 // Create the chat history
