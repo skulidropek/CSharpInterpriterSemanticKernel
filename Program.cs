@@ -14,7 +14,7 @@ builder.AddOpenAIChatCompletion(
 
 builder.Services.AddSingleton(s => new DependenciesOptions()
 {
-    Referense =
+    Referense = new List<string>()
     {
         "C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Ref\\8.0.1\\ref\\net8.0",
         "C:\\Users\\legov\\.nuget\\packages\\newtonsoft.json\\13.0.3\\lib\\net6.0",
@@ -24,9 +24,23 @@ builder.Services.AddSingleton(s => new DependenciesOptions()
 });
 
 builder.Plugins.AddFromType<RoslynCompilingPlugin>();
+//builder.Services.AddSingleton< RoslynCompilingPlugin>();
 
 var kernel = builder.Build();
 
+//var roslyn = kernel.Services.GetRequiredService<RoslynCompilingPlugin>();
+//Console.WriteLine(await roslyn.ExecuteCodeAsync(@"
+//using System;
+//class Program
+//{
+//    static void Main()
+//    {
+//        Console.WriteLine(""12321"");
+//    }
+//}
+//"));
+
+//return;
 // Retrieve the chat completion service from the kernel
 IChatCompletionService chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
 
