@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "CSharpInterpriterSemanticKernel": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "openai-api-key": ""
+      }
+    }
+  }
+}
