@@ -3,7 +3,7 @@
     "CSharpInterpriterSemanticKernel": {
       "commandName": "Project",
       "environmentVariables": {
-        "openai-api-key": ""
+        "openai-api-key": "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"
       }
     }
   }

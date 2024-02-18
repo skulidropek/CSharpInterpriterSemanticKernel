@@ -1,4 +1,5 @@
 ﻿using CSharpInterpriterSemanticKernel.Options;
+using CSharpInterpriterSemanticKernel.Services;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.SemanticKernel;
@@ -14,9 +15,11 @@ namespace CSharpInterpriterSemanticKernel.Plugins
     internal class RoslynCompilingPlugin
     {
         private readonly DependenciesOptions _dependenciesOptions;
-        public RoslynCompilingPlugin(DependenciesOptions dependenciesOptions)
+        private readonly DataRetrievalService _dataRetrievalService;
+        public RoslynCompilingPlugin(DependenciesOptions dependenciesOptions, DataRetrievalService dataRetrievalService)
         {
             _dependenciesOptions = dependenciesOptions;
+            _dataRetrievalService = dataRetrievalService;
         }
 
         [KernelFunction]
@@ -49,8 +52,12 @@ namespace CSharpInterpriterSemanticKernel.Plugins
                     var errors = result.Diagnostics
                         .Where(diagnostic => diagnostic.IsWarningAsError || diagnostic.Severity == DiagnosticSeverity.Error)
                         .Select(diag => $"{diag.Id}: {diag.GetMessage()}");
-                    Console.WriteLine("\nCode Interpreter: Compilation errors detected.");
-                    return "Compilation Errors: " + string.Join("\n", errors);
+
+                    var errorsText = string.Join("\n", errors);
+                    Console.WriteLine("\nCode Interpreter: Compilation errors detected.\n" + errorsText);
+
+                    
+                    return "Compilation Errors: " + errorsText + ".\n";
                 }
 
                 ms.Seek(0, SeekOrigin.Begin);
@@ -82,20 +89,30 @@ namespace CSharpInterpriterSemanticKernel.Plugins
                                     await (methodResult as Task);
                                 }
 
-                                resultText = "Console result: " + sw.ToString();
+                                resultText = "Console output: " + sw.ToString();
 
-                                Console.WriteLine("\nCode Interpreter: Execution completed. " + resultText);
+                                var resultTextLowwer = resultText.ToLower();
+
+                                if (resultTextLowwer.Contains("error") || resultTextLowwer.Contains("failed") || resultTextLowwer.Contains("exception"))
+                                {
+                                    resultText += "\n" + await _dataRetrievalService.RetrieveDataFromQDrantAsync(resultText, 0.8);
+                                }
+                                else
+                                {
+                                    resultText = "Preserve all useful information from the console output.\n" + resultText;
+                                }
                             }
                             catch (Exception ex)
                             {
                                 resultText = "Execution Error: " + ex.Message;
-                                Console.WriteLine("\nCode Interpreter: " + resultText);
+                                resultText += "\n" + await _dataRetrievalService.RetrieveDataFromQDrantAsync(ex.Message, 0.8);
                             }
                             finally
                             {
                                 Console.SetOut(originalOut);
                             }
 
+                            Console.WriteLine("Interpriter C#: " + resultText);
                             return resultText;
                         }
                     }
