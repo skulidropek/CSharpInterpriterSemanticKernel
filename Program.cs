@@ -10,6 +10,8 @@ using Microsoft.KernelMemory.AI.OpenAI;
 using Microsoft.KernelMemory.AI;
 using Microsoft.KernelMemory.MemoryStorage;
 using CSharpInterpriterSemanticKernel.Services;
+using DocumentFormat.OpenXml;
+using Library;
 
 var builder = Kernel.CreateBuilder();
 
@@ -50,8 +52,12 @@ builder.Services.AddSingleton(s => new DependenciesOptions()
         "C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Ref\\8.0.1\\ref\\net8.0",
         "C:\\Users\\legov\\.nuget\\packages\\htmlagilitypack\\1.11.59\\lib\\netstandard2.0\\",
         "C:\\Users\\legov\\.nuget\\packages\\newtonsoft.json\\13.0.3\\lib\\net6.0",
+        "C:\\Users\\legov\\.nuget\\packages\\telegram.bot\\20.0.0-alpha.1\\lib\\net6.0",
+        "C:\\Users\\legov\\OneDrive\\Documents\\GitHub\\Rust Dedicated Server\\Rust Dedicated Server\\Rust Dedicated Server\\Managed\\Managed",
     }
 });
+
+//C:\Users\legov\OneDrive\Documents\GitHub\Rust Dedicated Server\Rust Dedicated Server\Rust Dedicated Server\Managed\Managed
 
 builder.Plugins.AddFromType<RoslynCompilingPlugin>();
 builder.Plugins.AddFromType<QDrantPlugin>();
@@ -59,6 +65,7 @@ builder.Plugins.AddFromType<QDrantPlugin>();
 var kernel = builder.Build();
 
 IChatCompletionService chatCompletionService = kernel.GetRequiredService<IChatCompletionService>();
+
 
 var qdrantMemory = kernel.Services.GetRequiredService<IMemoryDb>();
 
@@ -75,6 +82,12 @@ catch (Exception ex)
     Console.WriteLine($"Ошибка при создании индекса: {ex.Message}");
 }
 
+//var dataRetrival = kernel.GetRequiredService<DataRetrievalService>();
+
+//foreach(var model in AssemblyDataSerializer.ConvertToModel("C:\\Users\\legov\\OneDrive\\Documents\\GitHub\\Rust Dedicated Server\\Rust Dedicated Server\\Rust Dedicated Server\\Managed\\Managed\\Assembly-CSharp.dll").Types)
+//{
+//    await dataRetrival.ArchiveInformationAsync(DateTime.Now, AssemblyDataSerializer.ConvertToText(model), model.ClassName);
+//}
 
 // Create the chat history
 ChatHistory chatMessages = new ChatHistory();
@@ -113,27 +126,27 @@ Instructions for System Use:
 
 By adhering to these principles, the system ensures a continuous improvement cycle, where each interaction enriches its knowledge base, leading to increasingly informed and accurate responses over time."
 
-//        ChatSystemPrompt = $@"Current Date: {DateTime.Now}
-//This ChatGPT system is enhanced with a special capability to ALWAYS RETAIN AND UTILIZE useful information by integrating with an external knowledge database through the QDrantPlugin. The system excels in synthesizing data into concise summaries, interpreting natural language queries with high precision, and extracting fundamental insights from a variety of sources. It's designed to KEEP ITS KNOWLEDGE CURRENT AND RELEVANT by ARCHIVING NEW INFORMATION INTO THE KNOWLEDGE DATABASE, ENSURING THE DATA REMAINS FRESH for temporal queries or up-to-date verification.
+        //        ChatSystemPrompt = $@"Current Date: {DateTime.Now}
+        //This ChatGPT system is enhanced with a special capability to ALWAYS RETAIN AND UTILIZE useful information by integrating with an external knowledge database through the QDrantPlugin. The system excels in synthesizing data into concise summaries, interpreting natural language queries with high precision, and extracting fundamental insights from a variety of sources. It's designed to KEEP ITS KNOWLEDGE CURRENT AND RELEVANT by ARCHIVING NEW INFORMATION INTO THE KNOWLEDGE DATABASE, ENSURING THE DATA REMAINS FRESH for temporal queries or up-to-date verification.
 
-//When interacting with users, the system prioritizes RETRIEVING AND ARCHIVING INFORMATION beyond its immediate knowledge base. It dynamically updates its understanding with the latest data, ensuring responses are informed by the MOST CURRENT INFORMATION AVAILABLE. The system uses an advanced text embedding generator to IDENTIFY SIMILAR EXISTING RECORDS before saving new data, preventing the duplication of information and maintaining the integrity of the database.
+        //When interacting with users, the system prioritizes RETRIEVING AND ARCHIVING INFORMATION beyond its immediate knowledge base. It dynamically updates its understanding with the latest data, ensuring responses are informed by the MOST CURRENT INFORMATION AVAILABLE. The system uses an advanced text embedding generator to IDENTIFY SIMILAR EXISTING RECORDS before saving new data, preventing the duplication of information and maintaining the integrity of the database.
 
-//The goal is to provide users with accurate, up-to-date responses by CONSTANTLY EXPANDING THE SYSTEM'S KNOWLEDGE BASE. This approach facilitates maintaining data freshness and ensures the system's responses are always grounded in the latest, most relevant information.
+        //The goal is to provide users with accurate, up-to-date responses by CONSTANTLY EXPANDING THE SYSTEM'S KNOWLEDGE BASE. This approach facilitates maintaining data freshness and ensures the system's responses are always grounded in the latest, most relevant information.
 
-//ВСЕГО ОБРАЩАЙСЯ К knowledge.
-//СОХРАНЯЙ ПОЛЕЗНУЮ ИНФОРМАЦИЮ В knowledge.
-//СОХРАНЯЙ АБСОЛЮТНО ВСЮ НОВУЮ ИНФОРМАЦИЮ В knowledge.
-//"
+        //ВСЕГО ОБРАЩАЙСЯ К knowledge.
+        //СОХРАНЯЙ ПОЛЕЗНУЮ ИНФОРМАЦИЮ В knowledge.
+        //СОХРАНЯЙ АБСОЛЮТНО ВСЮ НОВУЮ ИНФОРМАЦИЮ В knowledge.
+        //"
 
 
-    //@"
-    //This chat introduces you to a highly intelligent AI assistant, CSharpGPT, your ultimate guide for C# programming. Enhanced with specialized plugins for dynamic knowledge retrieval and real-time code execution, it features the QDrantPlugin for leveraging a QDrant-based knowledge base. This enables precise information retrieval and synthesis through advanced text embeddings, ensuring responses are both relevant and accurate.
+        //@"
+        //This chat introduces you to a highly intelligent AI assistant, CSharpGPT, your ultimate guide for C# programming. Enhanced with specialized plugins for dynamic knowledge retrieval and real-time code execution, it features the QDrantPlugin for leveraging a QDrant-based knowledge base. This enables precise information retrieval and synthesis through advanced text embeddings, ensuring responses are both relevant and accurate.
 
-    //The assistant also boasts capabilities for automatic C# code compilation and execution via the RoslynCompilingPlugin. Trained on diverse datasets up to 2021 and operating without real-time internet access, CSharpGPT relies on its extensive, internally curated knowledge base. It is prepared to assist with C# coding, debugging, learning, or enhancing your understanding of programming concepts, making it an invaluable tool for exploring, learning, and solving complex queries.
+        //The assistant also boasts capabilities for automatic C# code compilation and execution via the RoslynCompilingPlugin. Trained on diverse datasets up to 2021 and operating without real-time internet access, CSharpGPT relies on its extensive, internally curated knowledge base. It is prepared to assist with C# coding, debugging, learning, or enhancing your understanding of programming concepts, making it an invaluable tool for exploring, learning, and solving complex queries.
 
-    //With your precise questions, you can unlock the most accurate and informative responses. Let's dive into this sophisticated AI capability together.
-    //"
-};
+        //With your precise questions, you can unlock the most accurate and informative responses. Let's dive into this sophisticated AI capability together.
+        //"
+    };
 
     var result = chatCompletionService.GetStreamingChatMessageContentsAsync(
         chatMessages,

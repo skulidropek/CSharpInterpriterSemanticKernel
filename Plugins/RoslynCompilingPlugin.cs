@@ -1,5 +1,6 @@
 ﻿using CSharpInterpriterSemanticKernel.Options;
 using CSharpInterpriterSemanticKernel.Services;
+using Library;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.SemanticKernel;
@@ -99,7 +100,8 @@ namespace CSharpInterpriterSemanticKernel.Plugins
                                 }
                                 else
                                 {
-                                    resultText = "Preserve all useful information from the console output.\n" + resultText;
+                                    //"Preserve all useful information from the console output.\n" + 
+                                    resultText = resultText;
                                 }
                             }
                             catch (Exception ex)
@@ -123,6 +125,13 @@ namespace CSharpInterpriterSemanticKernel.Plugins
             }
         }
 
+        [KernelFunction]
+        [Description("Transforms a C# DLL file into an API by serializing the assembly data into text format. This function takes the path to the DLL as an input and returns a string representation of the DLL's data, facilitating the exposure of DLL functionalities as an API.")]
+        public string ToApi(string dllPath)
+        {
+            Console.WriteLine($"Преобразовываю в апи {dllPath}");
+            return $"Preserve all useful information from the Types.\nDll - {dllPath}.\nTypes: " + string.Join(',', AssemblyDataSerializer.ConvertToModel(dllPath).Types.Select(s => s.ClassName));
+        }
 
         private List<MetadataReference> LoadReferencesFromDirectory(string path)
         {
